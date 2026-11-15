@@ -1,28 +1,45 @@
 (function () {
   "use strict";
 
-  // Default framing: Auckland CBD down to Newmarket.
-  var CBD_BOUNDS = L.latLngBounds([-36.8720, 174.7480], [-36.8395, 174.7830]);
+  // Default framing when the page opens / "Reset view" is pressed: central Auckland CBD.
+  var CBD_BOUNDS = L.latLngBounds([-36.8560, 174.7520], [-36.8405, 174.7720]);
 
   var companies = (window.COMPANIES || []).slice().sort(function (a, b) {
     return a.name.localeCompare(b.name);
   });
 
+  // How far people can zoom IN. 16 = sharpest map; 17 = pins in busy spots separate more;
+  // 18 = very close (map gets blurry and you may see no pins at all).
+  var MAX_ZOOM = 17;
+
+  // How far people can pan: the area covered by all the pins, plus a small margin.
+  // Change PIN_MARGIN to allow more (0.3) or less (0.05) room around the pins.
+  var PIN_MARGIN = 0.15;
+  var PAN_LIMIT = L.latLngBounds(companies.map(function (c) { return [c.lat, c.lng]; }))
+    .extend(CBD_BOUNDS)
+    .pad(PIN_MARGIN);
+
   // ---------- Map ----------
   var map = L.map("map", {
     zoomControl: false,
-    minZoom: 12,
-    maxZoom: 18,
-    maxBounds: L.latLngBounds([-37.10, 174.50], [-36.60, 175.05]),
-    maxBoundsViscosity: 0.8
+    maxZoom: MAX_ZOOM,
+    maxBounds: PAN_LIMIT,
+    maxBoundsViscosity: 1.0 // 1.0 = hard edge, can't drag past it
   });
+
+  // Don't allow zooming out further than the pan area (recalculated if the window resizes).
+  function updateMinZoom() {
+    map.setMinZoom(map.getBoundsZoom(PAN_LIMIT));
+  }
+  updateMinZoom();
+  map.on("resize", updateMinZoom);
   L.control.zoom({ position: "bottomright" }).addTo(map);
 
   // Esri Light Gray Canvas: minimal basemap, free, no API key, works from file:// and GitHub Pages.
   // Real tiles only exist up to zoom 16; beyond that Leaflet enlarges them (maxNativeZoom).
   var ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
   L.tileLayer(ESRI + "World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    maxZoom: 18,
+    maxZoom: MAX_ZOOM,
     maxNativeZoom: 16,
     attribution:
       'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, HERE, Garmin, ' +
@@ -30,7 +47,7 @@
   }).addTo(map);
   // Street / place name labels drawn on top of the gray base.
   L.tileLayer(ESRI + "World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
-    maxZoom: 18,
+    maxZoom: MAX_ZOOM,
     maxNativeZoom: 16
   }).addTo(map);
 
@@ -145,7 +162,7 @@
       '<div class="meta">' + esc(c.category) + (c.address ? " · " + esc(c.address) : "") + "</div></div>";
     li.addEventListener("click", function () {
       if (isMobile.matches) setCollapsed(true);
-      map.flyTo([c.lat, c.lng], Math.max(map.getZoom(), 17), { duration: 0.6 });
+      map.flyTo([c.lat, c.lng], MAX_ZOOM, { duration: 0.6 });
       map.once("moveend", function () { c.marker.openPopup(); });
     });
     c.li = li;
