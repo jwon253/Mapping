@@ -98,9 +98,6 @@
           (c.description ? "<p>" + esc(c.description) + "</p>" : "") +
           (c.address ? '<p class="addr">' + esc(c.address) + "</p>" : "") +
           jobsHtml(c) +
-          (c.website
-            ? '<a href="' + esc(c.website) + '" target="_blank" rel="noopener">Visit website &rarr;</a>'
-            : "") +
         "</div>" +
       "</div>"
     );
@@ -185,16 +182,49 @@
     filtersEl.appendChild(b);
   });
 
+  // ---------- Show / hide individual companies ----------
+  // Remembered per browser; if storage is unavailable it just isn't remembered.
+  var HIDDEN_KEY = "acm-hidden-companies";
+  var hidden = {};
+  try { (JSON.parse(localStorage.getItem(HIDDEN_KEY)) || []).forEach(function (n) { hidden[n] = true; }); } catch (e) {}
+
+  function saveHidden() {
+    try { localStorage.setItem(HIDDEN_KEY, JSON.stringify(Object.keys(hidden))); } catch (e) {}
+  }
+  function setHidden(c, value) {
+    if (value) hidden[c.name] = true; else delete hidden[c.name];
+    c.toggle.checked = !value;
+  }
+
   companies.forEach(function (c) {
     var li = document.createElement("li");
     li.className = "item";
-    li.innerHTML =
+
+    var toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.className = "show-toggle";
+    toggle.checked = !hidden[c.name];
+    toggle.title = "Show on map";
+    toggle.setAttribute("aria-label", "Show " + c.name + " on map");
+    // Ticking the box only shows/hides — it doesn't fly the map to the company.
+    toggle.addEventListener("click", function (e) { e.stopPropagation(); });
+    toggle.addEventListener("change", function () {
+      setHidden(c, !toggle.checked);
+      saveHidden();
+      render();
+    });
+    c.toggle = toggle;
+    li.appendChild(toggle);
+
+    li.insertAdjacentHTML("beforeend",
       '<img src="' + esc(c.logo) + '" alt="">' +
       '<div><div class="name">' + esc(c.name) + "</div>" +
       '<div class="meta">' + esc(c.category) + (c.address ? " · " + esc(c.address) : "") +
       (c.jobs ? ' · <span class="roles">' + rolesText(c.jobs.count) + "</span>" : "") +
-      "</div></div>";
+      "</div></div>");
     li.addEventListener("click", function () {
+      // Clicking a hidden company's row turns it back on.
+      if (hidden[c.name]) { setHidden(c, false); saveHidden(); render(); }
       if (isMobile.matches) setCollapsed(true);
       map.flyTo([c.lat, c.lng], MAX_ZOOM, { duration: 0.6 });
       map.once("moveend", function () { c.marker.openPopup(); });
@@ -208,24 +238,44 @@
   emptyEl.textContent = "No companies match your search.";
   listEl.appendChild(emptyEl);
 
-  function render() {
+  function matchesFilters(c) {
     var q = searchEl.value.trim().toLowerCase();
-    var shown = 0;
+    var hay = (c.name + " " + c.category + " " + (c.address || "")).toLowerCase();
+    return (activeCat === "All" || c.category === activeCat) && (!q || hay.indexOf(q) !== -1);
+  }
+
+  var onMapEl = document.getElementById("on-map");
+
+  function render() {
+    var listed = 0, onMap = 0;
     companies.forEach(function (c) {
-      var hay = (c.name + " " + c.category + " " + (c.address || "")).toLowerCase();
-      var visible = (activeCat === "All" || c.category === activeCat) && (!q || hay.indexOf(q) !== -1);
-      c.li.style.display = visible ? "" : "none";
-      if (visible) {
-        shown++;
+      var inList = matchesFilters(c);
+      var showPin = inList && !hidden[c.name];
+      c.li.style.display = inList ? "" : "none";
+      c.li.classList.toggle("off", !!hidden[c.name]);
+      if (inList) listed++;
+      if (showPin) {
+        onMap++;
         if (!map.hasLayer(c.marker)) c.marker.addTo(map);
       } else if (map.hasLayer(c.marker)) {
         map.removeLayer(c.marker);
       }
     });
-    emptyEl.style.display = shown ? "none" : "";
-    countEl.textContent = shown;
+    emptyEl.style.display = listed ? "none" : "";
+    countEl.textContent = listed;
+    onMapEl.textContent = onMap + " of " + listed + " shown on map";
   }
   searchEl.addEventListener("input", render);
+
+  // Show all / Hide all apply to the companies currently listed (respects search + category).
+  function setAllListed(hide) {
+    companies.forEach(function (c) { if (matchesFilters(c)) setHidden(c, hide); });
+    saveHidden();
+    render();
+  }
+  document.getElementById("show-all").addEventListener("click", function () { setAllListed(false); });
+  document.getElementById("hide-all").addEventListener("click", function () { setAllListed(true); });
+
   render();
 
   // Mobile bottom-sheet toggle

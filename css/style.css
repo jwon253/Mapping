@@ -123,6 +123,39 @@ h1 {
 .item .meta { color: var(--muted); font-size: 0.78rem; }
 .empty { color: var(--muted); padding: 16px 10px; font-size: 0.9rem; }
 
+/* Show/hide toggles */
+.show-toggle {
+  width: 16px; height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.item.off img,
+.item.off .name,
+.item.off .meta { opacity: 0.4; }
+
+.list-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.list-tools span { flex: 1; }
+.list-tools button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.list-tools button:hover { background: var(--accent-soft); }
+
 /* ---------- Markers ---------- */
 .logo-marker { background: none; border: none; }
 
