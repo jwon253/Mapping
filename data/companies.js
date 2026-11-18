@@ -66,7 +66,7 @@ window.COMPANIES = [
     name: "Kordia",
     category: "Telecommunications",
     // address: "162 Victoria Street West, Auckland CBD, Auckland 1010",
-    lat: -36.84743358623588, lng: 174.76078687763072,
+    lat: -36.847942615486275, lng: 174.75869388216384,
     logo: "img/kordia_logo.jpg",
     website: "https://www.kordia.co.nz",
     description: "Network infrastructure, cybersecurity and broadcast services."
@@ -165,7 +165,7 @@ window.COMPANIES = [
     name: "DXC Technology",
     category: "Technology",
     // address: "Level 4/22 Viaduct Harbour Avenue, Auckland CBD",
-    lat: -36.8450321984541, lng: 174.75840145747497,
+    lat: -36.84513266638752, lng: 174.75789221714535,
     logo: "img/dxctechnology_logo.jpg",
     website: "https://dxc.com",
     description: "IT services and consulting."

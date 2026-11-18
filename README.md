@@ -26,6 +26,17 @@ Then open http://localhost:8000
 
 Entries marked `verify: true` have approximate locations that still need checking.
 
+## Update open-role counts
+
+```
+node scripts/fetch-jobs.mjs
+```
+
+This fetches the number of NZ job openings for each company and saves them to
+`data/jobs.js`. It skips placeholder ads like "Expressions of Interest". It only
+reads careers systems that allow automated access. Companies whose sites opt out
+(e.g. ASB, Mercury, Contact) are left without a count.
+
 ## Host on GitHub Pages
 
 1. Push this repo to GitHub.

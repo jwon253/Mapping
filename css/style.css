@@ -153,6 +153,27 @@ h1 {
 .logo-marker.selected .logo-pin { border-color: var(--accent); }
 .logo-marker.selected .logo-wrap::after { border-top-color: var(--accent); }
 
+/* Open-roles count bubble on the pin's top-right corner */
+.job-badge {
+  position: absolute;
+  top: -8px; right: -10px;
+  min-width: 20px; height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.job-badge.zero { background: #9ca3af; }
+
+.updated { margin: -8px 0 14px; color: var(--muted); font-size: 0.75rem; }
+.item .roles { color: var(--accent); font-weight: 600; }
+
 /* ---------- Popup ---------- */
 .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: var(--shadow); }
 .leaflet-popup-content { margin: 14px 16px; font-family: inherit; }
@@ -172,6 +193,9 @@ h1 {
 .pop .addr { color: var(--muted); }
 .pop a { color: var(--accent); font-weight: 600; font-size: 0.82rem; text-decoration: none; }
 .pop a:hover { text-decoration: underline; }
+.pop .jobs { margin: 8px 0 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+.pop .jobs b { color: var(--accent); }
+.pop .asof { color: var(--muted); font-size: 0.75rem; }
 
 /* ---------- Reset button ---------- */
 .reset {

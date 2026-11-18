@@ -67,6 +67,27 @@
     });
   }
 
+  // Job counts from data/jobs.js (made by scripts/fetch-jobs.mjs). Companies
+  // without a permitted data source simply have no count.
+  var JOBS = window.JOBS || {};
+  companies.forEach(function (c) { c.jobs = JOBS[c.name] || null; });
+
+  function rolesText(n) { return n + (n === 1 ? " open role" : " open roles"); }
+
+  function formatDate(iso) {
+    var d = new Date(iso + "T00:00:00");
+    return isNaN(d) ? iso : d.toLocaleDateString("en-NZ", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function jobsHtml(c) {
+    if (!c.jobs) return "";
+    return (
+      '<p class="jobs"><b>' + rolesText(c.jobs.count) + "</b> in " + esc(c.jobs.area || "NZ") +
+      ' <span class="asof">(as of ' + esc(formatDate(c.jobs.updated)) + ")</span><br>" +
+      '<a href="' + esc(c.jobs.careers) + '" target="_blank" rel="noopener">View jobs &rarr;</a></p>'
+    );
+  }
+
   function popupHtml(c) {
     return (
       '<div class="pop">' +
@@ -76,6 +97,7 @@
           '<span class="cat">' + esc(c.category) + "</span>" +
           (c.description ? "<p>" + esc(c.description) + "</p>" : "") +
           (c.address ? '<p class="addr">' + esc(c.address) + "</p>" : "") +
+          jobsHtml(c) +
           (c.website
             ? '<a href="' + esc(c.website) + '" target="_blank" rel="noopener">Visit website &rarr;</a>'
             : "") +
@@ -93,7 +115,12 @@
       html:
         '<div class="logo-wrap"><div class="logo-pin">' +
         '<img src="' + esc(c.logo) + '" alt="' + esc(c.name) + '">' +
-        "</div></div>",
+        "</div>" +
+        (c.jobs
+          ? '<span class="job-badge' + (c.jobs.count ? "" : " zero") + '" title="' +
+            esc(rolesText(c.jobs.count)) + '">' + c.jobs.count + "</span>"
+          : "") +
+        "</div>",
       iconSize: [40, 48],
       iconAnchor: [20, 48],
       popupAnchor: [0, -46]
@@ -124,6 +151,11 @@
   }
 
   // ---------- Side panel ----------
+  if (window.JOBS_UPDATED) {
+    var upd = document.getElementById("jobs-updated");
+    upd.textContent = "Open roles last updated " + formatDate(window.JOBS_UPDATED);
+    upd.hidden = false;
+  }
   var listEl = document.getElementById("list");
   var searchEl = document.getElementById("search");
   var filtersEl = document.getElementById("filters");
@@ -159,7 +191,9 @@
     li.innerHTML =
       '<img src="' + esc(c.logo) + '" alt="">' +
       '<div><div class="name">' + esc(c.name) + "</div>" +
-      '<div class="meta">' + esc(c.category) + (c.address ? " · " + esc(c.address) : "") + "</div></div>";
+      '<div class="meta">' + esc(c.category) + (c.address ? " · " + esc(c.address) : "") +
+      (c.jobs ? ' · <span class="roles">' + rolesText(c.jobs.count) + "</span>" : "") +
+      "</div></div>";
     li.addEventListener("click", function () {
       if (isMobile.matches) setCollapsed(true);
       map.flyTo([c.lat, c.lng], MAX_ZOOM, { duration: 0.6 });
