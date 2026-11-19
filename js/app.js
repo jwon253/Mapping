@@ -108,8 +108,12 @@
 
   function useGoogle(key) {
     var api = "https://tile.googleapis.com";
+    // Browsers normally send only "https://jwon253.github.io/" to other sites. Send the
+    // full page address instead, so a key restricted to ".../Mapping/*" is accepted.
+    var REFERRER = "no-referrer-when-downgrade";
     // 1. Start a map session (sets the style). Fails if the key is missing/invalid/restricted.
     fetch(api + "/v1/createSession?key=" + encodeURIComponent(key), {
+      referrerPolicy: REFERRER,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mapType: "roadmap", language: "en-NZ", region: "NZ", styles: GOOGLE_STYLE })
@@ -119,6 +123,7 @@
         var q = "?session=" + encodeURIComponent(s.session) + "&key=" + encodeURIComponent(key);
         var layer = L.tileLayer(api + "/v1/2dtiles/{z}/{x}/{y}" + q, {
           maxZoom: MAX_ZOOM,
+          referrerPolicy: REFERRER,
           attribution: "Map data &copy; Google"
         });
         // 2. If tiles keep failing (quota used up, key revoked…), switch to Esri.
@@ -144,7 +149,7 @@
           var b = map.getBounds();
           fetch(api + "/tile/v1/viewport" + q + "&zoom=" + map.getZoom() +
                 "&north=" + b.getNorth() + "&south=" + b.getSouth() +
-                "&east=" + b.getEast() + "&west=" + b.getWest())
+                "&east=" + b.getEast() + "&west=" + b.getWest(), { referrerPolicy: REFERRER })
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (v) {
               if (basemap !== layer || !v || !v.copyright || v.copyright === googleCopyright) return;
