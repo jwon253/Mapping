@@ -12,27 +12,52 @@
   // 18 = very close (map gets blurry and you may see no pins at all).
   var MAX_ZOOM = 17;
 
-  // How far people can pan: the area covered by all the pins, plus a small margin.
-  // Change PIN_MARGIN to allow more (0.3) or less (0.05) room around the pins.
+  // The area covered by all the pins (plus the CBD).
+  var PIN_BOUNDS = L.latLngBounds(companies.map(function (c) { return [c.lat, c.lng]; }))
+    .extend(CBD_BOUNDS);
+
+  // Zooming out stops when all pins fit, plus this margin (0.15 = 15% extra each side).
   var PIN_MARGIN = 0.15;
-  var PAN_LIMIT = L.latLngBounds(companies.map(function (c) { return [c.lat, c.lng]; }))
-    .extend(CBD_BOUNDS)
-    .pad(PIN_MARGIN);
+
+  // Panning: any pin can be moved right across the screen (e.g. Wynyard Quarter
+  // down to the bottom), but at least this many pixels of map past the outermost
+  // pin always stay on screen, so you can't lose the pins entirely.
+  var EDGE_PX = 700;
+
+  // Sideways panning is capped at this many pixels past the outermost pins, so wide
+  // screens don't show lots of empty suburbs to the west/east. 400 still lets the
+  // western pins (e.g. Serato) slide out from behind the 300px roles panel.
+  var SIDE_PX = 400;
 
   // ---------- Map ----------
   var map = L.map("map", {
     zoomControl: false,
     maxZoom: MAX_ZOOM,
-    maxBounds: PAN_LIMIT,
     maxBoundsViscosity: 1.0 // 1.0 = hard edge, can't drag past it
   });
 
-  // Don't allow zooming out further than the pan area (recalculated if the window resizes).
-  function updateMinZoom() {
-    map.setMinZoom(map.getBoundsZoom(PAN_LIMIT));
+  // Pan limit is measured in screen pixels, so it differs for each zoom level.
+  function limitsFor(z) {
+    var size = map.getSize();
+    var dx = Math.min(Math.max(size.x - EDGE_PX, 0), SIDE_PX);
+    var dy = Math.max(size.y - EDGE_PX, 0);
+    var sw = map.project(PIN_BOUNDS.getSouthWest(), z).add([-dx, dy]);
+    var ne = map.project(PIN_BOUNDS.getNorthEast(), z).add([dx, -dy]);
+    return L.latLngBounds(map.unproject(sw, z), map.unproject(ne, z));
   }
-  updateMinZoom();
-  map.on("resize", updateMinZoom);
+  function updateLimits() {
+    map.setMinZoom(map.getBoundsZoom(PIN_BOUNDS.pad(PIN_MARGIN)));
+    map.setMaxBounds(limitsFor(map.getZoom()));
+  }
+  map.on("zoomend resize", updateLimits);
+
+  // When zooming, Leaflet keeps the view inside the limit — but it would use the
+  // limit of the zoom level you're leaving, then snap back once the zoom ends.
+  // Use the limit of the zoom level you're going TO instead, so there's no jump.
+  var limitCenter = map._limitCenter;
+  map._limitCenter = function (center, zoom, bounds) {
+    return limitCenter.call(this, center, zoom, bounds && limitsFor(zoom));
+  };
   L.control.zoom({ position: "bottomright" }).addTo(map);
 
   // Esri Light Gray Canvas: minimal basemap, free, no API key, works from file:// and GitHub Pages.
@@ -55,6 +80,7 @@
     map.fitBounds(CBD_BOUNDS, { padding: [10, 10] });
   }
   resetView();
+  updateLimits();
   document.getElementById("reset").addEventListener("click", function () {
     map.closePopup();
     resetView();

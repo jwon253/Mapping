@@ -1,4 +1,4 @@
-# Auckland Company Map
+# Auckland Mapping
 
 An interactive map of where major companies are located in central Auckland.
 It opens on the CBD, shows each company's logo as a pin, and has a searchable,
