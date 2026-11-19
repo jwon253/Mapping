@@ -2,10 +2,114 @@
 window.JOBS_UPDATED = "2026-11-19";
 window.JOBS = {
   "Westpac": {
-    "count": 21,
+    "count": 17,
     "area": "Auckland",
     "careers": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers?locations=cda8a2a59ea710075dcd875752d30000",
-    "updated": "2026-11-18"
+    "updated": "2026-11-19",
+    "roles": [
+      {
+        "title": "Learning Programme Lead - Banker Capability",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Learning-Programme-Lead_JR108216-1",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-18"
+      },
+      {
+        "title": "Head of Infrastructure, Property and Large Corporates",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Head-of-Infrastructure--Property-and-Large-Corporates_JR108138",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-17"
+      },
+      {
+        "title": "Information Security Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Information-Security-Engineer_JR107862",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-17"
+      },
+      {
+        "title": "Senior Platform Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Senior-Platform-Engineer_JR108217",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-17"
+      },
+      {
+        "title": "Technical Systems Analyst",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Technical-Systems-Analyst_JR108251",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-17"
+      },
+      {
+        "title": "Quality Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Quality-Engineer_JR108225",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-13"
+      },
+      {
+        "title": "Senior Quality Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Senior-Quality-Engineer_JR107890",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-13"
+      },
+      {
+        "title": "Analyst Operations and Strategy",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Analyst-Operations-and-Strategy_JR108279",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-12"
+      },
+      {
+        "title": "Senior Platform Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Senior-Platform-Engineer_JR108282-1",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-10"
+      },
+      {
+        "title": "Senior Platform Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Senior-Platform-Engineer_JR108226",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-10"
+      },
+      {
+        "title": "Awhi Tū - Rangatahi Māori Banking Cadet",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Awhi-T---Rangatahi-Mori-Banking-Cadet_JR108012",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-09"
+      },
+      {
+        "title": "Lead Engineer",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Lead-Engineer_JR108200",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-09"
+      },
+      {
+        "title": "Project Manager / Delivery Lead",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Delivery-Lead_JR108213",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-06"
+      },
+      {
+        "title": "Senior Relationship Associate - Property Finance",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Senior-Relationship-Associate---Property-Finance_JR108276",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-06"
+      },
+      {
+        "title": "Executive Private Adviser",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Executive-Private-Adviser_JR108044",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-05"
+      },
+      {
+        "title": "Technical Delivery Lead",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Technical-Delivery-Lead_JR107672-1",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-11-04"
+      },
+      {
+        "title": "Principal Engineer - D365 & AI",
+        "url": "https://westpacnz.wd105.myworkdayjobs.com/Westpac_Careers/job/Westpac-on-Takutai-Square/Principal-Software-Engineer---D365---AI_JR106501-1",
+        "location": "Westpac on Takutai Square",
+        "posted": "2026-10-30"
+      }
+    ]
   },
   "BNZ": {
     "count": 12,
@@ -304,8 +408,8 @@ window.JOBS = {
     "updated": "2026-11-19",
     "roles": [
       {
-        "title": "Customer Advisor",
-        "url": "https://careers.sparknz.co.nz/careers/JobDetail/Customer-Advisor/66710",
+        "title": "Customer Advisor (Oamaru)",
+        "url": "https://careers.sparknz.co.nz/careers/JobDetail/Customer-Advisor-Oamaru/66710",
         "posted": "2026-11-18"
       },
       {
