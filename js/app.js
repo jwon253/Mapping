@@ -71,6 +71,8 @@
     { featureType: "poi", stylers: [{ visibility: "off" }] },
     { featureType: "transit", stylers: [{ visibility: "off" }] },
     { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    // Hide names of small residential streets (main roads + suburbs keep their names).
+    { featureType: "road.local", elementType: "labels", stylers: [{ visibility: "off" }] },
     { featureType: "water", elementType: "geometry", stylers: [{ color: "#d3d5db" }] }
   ];
 
