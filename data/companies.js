@@ -11,6 +11,9 @@
  * Addresses are kept as comments for reference only (not shown on the map).
  * To show one, remove the // in front of it.
  *
+ * careers: link shown as "View jobs" for companies whose open roles can't be
+ *          counted automatically (counted companies get their link from jobs.js).
+ *
  * verify: true  -> location is a best guess and should be checked.
  */
 window.COMPANIES = [
@@ -31,6 +34,7 @@ window.COMPANIES = [
     lat: -36.841318759375866, lng: 174.75749700029922,
     logo: "img/asb_bank_logo.jpg",
     website: "https://www.asb.co.nz",
+    careers: "https://careers.asbgroup.co.nz/search?search=",
     description: "Major NZ bank with its head office in Wynyard Quarter."
   },
   {
@@ -49,6 +53,7 @@ window.COMPANIES = [
     lat: -36.84488145001219, lng: 174.75485225992654,
     logo: "img/kiwibank_logo.jpg",
     website: "https://www.kiwibank.co.nz",
+    careers: "https://kiwibankpeople.csod.com/ux/ats/careersite/1/home?c=kiwibankpeople",
     description: "New Zealand-owned bank."
   },
   {
@@ -98,6 +103,7 @@ window.COMPANIES = [
     lat: -36.84314314077949, lng: 174.76512364866923,
     logo: "img/contactenergy_logo.jpg",
     website: "https://contact.co.nz",
+    careers: "https://contact.co.nz/about-us/careers#vacancies",
     description: "Electricity generator and retailer."
   },
   {
@@ -107,6 +113,7 @@ window.COMPANIES = [
     lat: -36.86465601551404, lng: 174.77914410959184,
     logo: "img/mercury_logo.jpg",
     website: "https://www.mercury.co.nz",
+    careers: "https://careers.mercury.co.nz/",
     description: "Renewable electricity generator and retailer."
   },
 
@@ -159,6 +166,7 @@ window.COMPANIES = [
     lat: -36.84442553962736, lng: 174.75531672493494,
     logo: "img/datacom_logo.jpg",
     website: "https://datacom.com",
+    careers: "https://datacom.com/nz/en/careers/search?search=&page=1&sortBy=&category=&searchCity=Auckland&searchCountry=",
     description: "One of New Zealand's largest IT services companies."
   },
   {
@@ -195,6 +203,7 @@ window.COMPANIES = [
     lat: -36.84980478703813, lng: 174.75611892300293,
     logo: "img/fujitsu_logo.jpg",
     website: "https://www.fujitsu.com/nz/",
+    careers: "https://www.jobs.global.fujitsu.com/search?searchResultView=LIST&locationsearch=auckland&pageNumber=0&facetFilters=%7B%7D&sortBy=&markerViewed=&carouselIndex=",
     description: "IT services and consulting."
   },
   {
@@ -204,17 +213,18 @@ window.COMPANIES = [
     lat: -36.863917616111685, lng: 174.76443128075584,
     logo: "img/orion_health_logo.jpg",
     website: "https://orionhealth.com",
+    careers: "https://orionhealth.com/nz/job-search/",
     description: "Health information technology company."
   },
-  {
-    name: "Plexure",
-    category: "Technology",
-    // address: "Level 2, 2 Graham Street, Auckland CBD, Auckland 1010",
-    lat: -36.847267853012205, lng: 174.75906626089485,
-    logo: "img/plexuregroup_logo.jpg",
-    website: "https://www.plexure.com",
-    description: "Mobile engagement and personalisation software."
-  },
+  // {
+  //   name: "Plexure",
+  //   category: "Technology",
+  //   // address: "Level 2, 2 Graham Street, Auckland CBD, Auckland 1010",
+  //   lat: -36.847267853012205, lng: 174.75906626089485,
+  //   logo: "img/plexuregroup_logo.jpg",
+  //   website: "https://www.plexure.com",
+  //   description: "Mobile engagement and personalisation software."
+  // },
   {
     name: "Ricoh NZ",
     category: "Technology",
@@ -222,6 +232,7 @@ window.COMPANIES = [
     lat: -36.84949136395121, lng: 174.75728523016946,
     logo: "img/ricoh_new_zealand_limited_logo.jpg",
     website: "https://www.ricoh.co.nz",
+    careers: "https://nz.seek.com/Ricoh-jobs/at-this-company", // no own careers page; jobs are on Seek
     description: "Printing, imaging and workplace technology."
   },
   {
@@ -249,6 +260,7 @@ window.COMPANIES = [
     lat: -36.849707880260034, lng: 174.78425174821564,
     logo: "img/the_instillery_logo.jpg",
     website: "https://www.theinstillery.com",
+    careers: "https://nz.seek.com/The-Instillery-jobs?advertiserid=32818242", // jobs are on Seek
     description: "Cloud, security and managed IT services."
   },
   {
@@ -258,6 +270,7 @@ window.COMPANIES = [
     lat: -36.85706986660162, lng: 174.75871874451204,
     logo: "img/theta_nz_logo.jpg",
     website: "https://www.theta.co.nz",
+    careers: "https://www.theta.co.nz/careers#opportunities",
     description: "Digital and technology consultancy."
   },
   {
@@ -267,6 +280,7 @@ window.COMPANIES = [
     lat: -36.84514299865213, lng: 174.75549031514691,
     logo: "img/trade_me_logo.jpg",
     website: "https://www.trademe.co.nz",
+    careers: "https://trademe.csod.com/ux/ats/careersite/1/home?c=trademe",
     description: "New Zealand's largest online marketplace."
   },
   {

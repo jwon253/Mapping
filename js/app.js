@@ -79,14 +79,64 @@
     return isNaN(d) ? iso : d.toLocaleDateString("en-NZ", { day: "numeric", month: "short", year: "numeric" });
   }
 
-  function jobsHtml(c) {
-    if (!c.jobs) return "";
+  function roleItem(r) {
+    var meta = [r.location, r.posted ? "posted " + formatDate(r.posted) : ""].filter(Boolean).join(" · ");
     return (
-      '<p class="jobs"><b>' + rolesText(c.jobs.count) + "</b> in " + esc(c.jobs.area || "NZ") +
-      ' <span class="asof">(as of ' + esc(formatDate(c.jobs.updated)) + ")</span><br>" +
-      '<a href="' + esc(c.jobs.careers) + '" target="_blank" rel="noopener">View jobs &rarr;</a></p>'
+      '<li><a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.title) + "</a>" +
+      (meta ? '<span class="role-meta">' + esc(meta) + "</span>" : "") +
+      "</li>"
     );
   }
+
+  // Popup only shows the count; the full list of roles goes in the roles panel.
+  function jobsHtml(c) {
+    if (!c.jobs) {
+      return (
+        '<div class="jobs"><p class="na-note"><span class="na-dot' + (c.careers ? " link" : "") + '"></span>Open-role count not available</p>' +
+        (c.careers ? '<a href="' + esc(c.careers) + '" target="_blank" rel="noopener">View jobs &rarr;</a>' : "") +
+        "</div>"
+      );
+    }
+    return (
+      '<div class="jobs"><p><b>' + rolesText(c.jobs.count) + "</b> in " + esc(c.jobs.area || "NZ") +
+      ' <span class="asof">(as of ' + esc(formatDate(c.jobs.updated)) + ")</span></p>" +
+      '<a href="' + esc(c.jobs.careers) + '" target="_blank" rel="noopener">View jobs &rarr;</a></div>'
+    );
+  }
+
+  // ---------- Roles panel ----------
+  var rp = {
+    el: document.getElementById("roles-panel"),
+    logo: document.getElementById("rp-logo"),
+    name: document.getElementById("rp-name"),
+    sub: document.getElementById("rp-sub"),
+    list: document.getElementById("rp-list"),
+    careers: document.getElementById("rp-careers")
+  };
+
+  function openRoles(c) {
+    if (!c.jobs) { closeRoles(); return; }
+    var roles = c.jobs.roles;
+    rp.logo.src = c.logo;
+    rp.name.textContent = c.name;
+    rp.sub.textContent =
+      rolesText(c.jobs.count) + " in " + (c.jobs.area || "NZ") + " · as of " + formatDate(c.jobs.updated);
+    rp.careers.href = c.jobs.careers;
+    if (roles && roles.length) {
+      rp.list.innerHTML = roles.map(roleItem).join("");
+    } else {
+      rp.list.innerHTML =
+        '<li class="rp-empty">' +
+        (roles ? "No open roles right now." : "The list of roles will appear after the next update.") +
+        "</li>";
+    }
+    rp.list.scrollTop = 0;
+    rp.el.hidden = false;
+  }
+
+  function closeRoles() { rp.el.hidden = true; }
+
+  document.getElementById("rp-close").addEventListener("click", function () { map.closePopup(); closeRoles(); });
 
   function popupHtml(c) {
     return (
@@ -103,6 +153,9 @@
     );
   }
 
+  // Phone-sized screen? (matches the CSS breakpoint)
+  function isNarrow() { return window.matchMedia("(max-width: 760px)").matches; }
+
   // ---------- Markers ----------
   var selected = null;
 
@@ -116,7 +169,10 @@
         (c.jobs
           ? '<span class="job-badge' + (c.jobs.count ? "" : " zero") + '" title="' +
             esc(rolesText(c.jobs.count)) + '">' + c.jobs.count + "</span>"
-          : "") +
+          // No data for this company: a plain red dot (a number would be misleading).
+          // Orange = careers link available, red = no link either.
+          : '<span class="job-badge na' + (c.careers ? " link" : "") + '" title="Open-role count not available' +
+            (c.careers ? " (careers link in popup)" : "") + '"></span>') +
         "</div>",
       iconSize: [40, 48],
       iconAnchor: [20, 48],
@@ -124,7 +180,8 @@
     });
 
     c.marker = L.marker([c.lat, c.lng], { icon: icon, title: c.name, riseOnHover: true })
-      .bindPopup(popupHtml(c), { maxWidth: 300 })
+      // Left padding keeps the popup clear of the roles panel when the map auto-pans.
+      .bindPopup(popupHtml(c), { maxWidth: 300, autoPanPaddingTopLeft: [isNarrow() ? 10 : 330, 10] })
       .addTo(map);
 
     c.marker.on("popupopen", function () { select(c); });
@@ -137,7 +194,8 @@
     }
     if (selected && selected.li) selected.li.classList.remove("active");
     selected = c;
-    if (!c) return;
+    if (!c) { closeRoles(); return; }
+    openRoles(c);
     var el = c.marker.getElement();
     if (el) el.classList.add("selected");
     c.marker.setZIndexOffset(1000);

@@ -31,6 +31,22 @@
     <ul id="list" class="list"></ul>
   </aside>
 
+  <!-- Open roles for the selected company (slides out beside the sidebar) -->
+  <aside id="roles-panel" class="roles-panel" aria-label="Open roles" hidden>
+    <header class="rp-head">
+      <img id="rp-logo" src="" alt="">
+      <div class="rp-title">
+        <h2 id="rp-name"></h2>
+        <p id="rp-sub"></p>
+      </div>
+      <button id="rp-close" class="rp-close" type="button" aria-label="Close roles list">&times;</button>
+    </header>
+    <ul id="rp-list" class="rp-list"></ul>
+    <footer class="rp-foot">
+      <a id="rp-careers" href="#" target="_blank" rel="noopener">View all on careers site &rarr;</a>
+    </footer>
+  </aside>
+
   <main id="map" aria-label="Map of Auckland"></main>
   <button id="reset" class="reset" title="Back to Auckland CBD">Reset view</button>
 

@@ -203,6 +203,19 @@ h1 {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 .job-badge.zero { background: #9ca3af; }
+/* No data available: small red dot, no number */
+.job-badge.na {
+  top: -5px; right: -5px;
+  min-width: 0;
+  width: 14px; height: 14px;
+  padding: 0;
+  background: #dc2626;
+}
+.pop .na-note { color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.na-dot { width: 8px; height: 8px; border-radius: 50%; background: #dc2626; flex-shrink: 0; }
+/* Count not available, but there's a careers link to check manually */
+.job-badge.na.link,
+.na-dot.link { background: #f59e0b; }
 
 .updated { margin: -8px 0 14px; color: var(--muted); font-size: 0.75rem; }
 .item .roles { color: var(--accent); font-weight: 600; }
@@ -226,8 +239,82 @@ h1 {
 .pop .addr { color: var(--muted); }
 .pop a { color: var(--accent); font-weight: 600; font-size: 0.82rem; text-decoration: none; }
 .pop a:hover { text-decoration: underline; }
-.pop .jobs { margin: 8px 0 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+.pop .jobs { margin: 8px 0 2px; padding-top: 8px; border-top: 1px solid var(--line); }
+.pop .jobs p { margin: 0 0 6px; }
 .pop .jobs b { color: var(--accent); }
+
+/* ---------- Roles panel (slides out beside the sidebar) ---------- */
+.roles-panel {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--panel-w);
+  width: 300px;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  box-shadow: 6px 0 18px rgba(15, 23, 42, 0.08);
+  z-index: 950;
+  display: flex;
+  flex-direction: column;
+  animation: rp-slide 0.18s ease-out;
+}
+.roles-panel[hidden] { display: none; }
+@keyframes rp-slide {
+  from { transform: translateX(-16px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.rp-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 14px 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.rp-head img {
+  width: 40px; height: 40px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.rp-title { flex: 1; min-width: 0; }
+.rp-title h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+.rp-title p { margin: 2px 0 0; font-size: 0.78rem; color: var(--muted); }
+.rp-close {
+  width: 30px; height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.rp-close:hover { background: var(--hover); color: var(--text); }
+
+.rp-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+.rp-list li {
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+.rp-list li:hover { background: var(--hover); }
+.rp-list a { color: var(--text); font-weight: 500; text-decoration: none; }
+.rp-list a:hover { color: var(--accent); text-decoration: underline; }
+.role-meta { display: block; color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+.rp-list .rp-empty { color: var(--muted); }
+.rp-list .rp-empty:hover { background: none; }
+
+.rp-foot { padding: 12px 16px; border-top: 1px solid var(--line); }
+.rp-foot a { color: var(--accent); font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+.rp-foot a:hover { text-decoration: underline; }
 .pop .asof { color: var(--muted); font-size: 0.75rem; }
 
 /* ---------- Reset button ---------- */
@@ -284,4 +371,22 @@ h1 {
   }
   h1 { font-size: 1.1rem; }
   .sub { margin-bottom: 10px; }
+
+  /* Roles panel becomes its own bottom sheet on top of the company list */
+  .roles-panel {
+    top: auto;
+    left: 0;
+    width: 100%;
+    height: 55vh;
+    border-right: none;
+    border-top: 1px solid var(--line);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1100;
+    animation-name: rp-rise;
+  }
+  @keyframes rp-rise {
+    from { transform: translateY(24px); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
 }
