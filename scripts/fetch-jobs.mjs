@@ -26,18 +26,25 @@ const PLACEHOLDER = /expressions? of interest|share your details|register your i
 // ---------- helpers ----------
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function get(url, opts = {}, tries = 3) {
-  const res = await fetch(url, {
-    ...opts,
-    headers: { "User-Agent": UA, Accept: "application/json, text/html, application/xml", ...(opts.headers || {}) }
-  });
-  // 429 = "too many requests": wait and try again a couple of times.
-  if (res.status === 429 && tries > 1) {
-    await sleep(15000);
-    return get(url, opts, tries - 1);
+// opts.retryWaits = how long to wait (ms) before each retry after a 429.
+async function get(url, opts = {}) {
+  const { retryWaits = [15000, 15000], ...fetchOpts } = opts;
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, {
+      ...fetchOpts,
+      headers: { "User-Agent": UA, Accept: "application/json, text/html, application/xml", ...(fetchOpts.headers || {}) }
+    });
+    // 429 = "too many requests": wait (as long as the site asks, if it says) and try again.
+    if (res.status === 429 && attempt < retryWaits.length) {
+      const asked = parseInt(res.headers.get("retry-after") || "", 10) * 1000;
+      const wait = Math.max(retryWaits[attempt], asked || 0);
+      console.log(`  … ${new URL(url).host} says too many requests, waiting ${Math.round(wait / 1000)}s`);
+      await sleep(wait);
+      continue;
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return res;
   }
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  return res;
 }
 const getText = async (url, opts) => (await get(url, opts)).text();
 const getJson = async (url, opts) => (await get(url, opts)).json();
@@ -83,13 +90,17 @@ const titleFromSlug = (slug) =>
 const readers = {
   // Workday (public careers site JSON). `facets` = the filters from the careers URL,
   // e.g. ?locations=abc123  ->  { locations: ["abc123"] }
+  // Workday limits request rates, so go slowly: pause before starting, 6s between
+  // pages, and back off for 30s / 60s / 120s if it still says "too many requests".
   async workday({ host, tenant, site, facets = {} }) {
     const roles = [];
+    await sleep(10000);
     for (let offset = 0; ; offset += 20) {
       const d = await getJson(`https://${host}/wday/cxs/${tenant}/${site}/jobs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ limit: 20, offset, searchText: "", appliedFacets: facets })
+        body: JSON.stringify({ limit: 20, offset, searchText: "", appliedFacets: facets }),
+        retryWaits: [30000, 60000, 120000]
       });
       for (const j of d.jobPostings || []) {
         roles.push({
@@ -100,7 +111,7 @@ const readers = {
         });
       }
       if (!d.jobPostings?.length || roles.length >= d.total) break;
-      await sleep(3000);
+      await sleep(6000);
     }
     return roles;
   },
