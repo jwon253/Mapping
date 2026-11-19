@@ -37,6 +37,16 @@ This fetches the number of NZ job openings for each company and saves them to
 reads careers systems that allow automated access. Companies whose sites opt out
 (e.g. ASB, Mercury, Contact) are left without a count.
 
+To refresh only some companies: `node scripts/fetch-jobs.mjs "ANZ" "One NZ"`
+
+### Weekly automatic update
+
+`.github/workflows/weekly-jobs.yml` runs the script on GitHub every Monday at
+about 7am NZ time and commits the new `data/jobs.js`, so the live site updates
+itself. To run it straight away: GitHub → **Actions** → **Weekly job update** →
+**Run workflow**. Remember to `git pull` before your own changes so you have the
+latest counts.
+
 ## Host on GitHub Pages
 
 1. Push this repo to GitHub.

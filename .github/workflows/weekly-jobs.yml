@@ -1,0 +1,44 @@
+# Refreshes the open-role counts every week and publishes them to the live site.
+#
+# Runs automatically every Monday at about 7am NZ time, and can also be run any
+# time from GitHub: Actions tab -> "Weekly job update" -> "Run workflow".
+name: Weekly job update
+
+on:
+  schedule:
+    # Cron is in UTC. Sunday 18:00 UTC = Monday 7am NZDT (6am during NZ winter time).
+    - cron: "0 18 * * 0"
+  workflow_dispatch: {} # adds the manual "Run workflow" button
+
+permissions:
+  contents: write # needed to commit the updated data/jobs.js
+
+concurrency:
+  group: weekly-jobs
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch open roles
+        run: node scripts/fetch-jobs.mjs
+
+      - name: Commit and push if anything changed
+        run: |
+          if git diff --quiet -- data/jobs.js; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add data/jobs.js
+          git commit -m "Weekly job update ($(date -u +%Y-%m-%d))"
+          git push
