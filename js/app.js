@@ -60,21 +60,111 @@
   };
   L.control.zoom({ position: "bottomright" }).addTo(map);
 
+  // ---------- Basemap: Google Maps, with Esri as backup ----------
+  // Paste a Google Maps Platform API key (with the "Map Tiles API" enabled) here.
+  // Leave it empty, or if Google refuses the key, the free Esri map is used instead.
+  var GOOGLE_MAPS_KEY = "AIzaSyBxYNN-hZSHe5jCdsPAhYMVhARj-s-kltg";
+
+  // Quiet, grey Google style (similar to the Esri look): no shops/POIs or transit icons.
+  var GOOGLE_STYLE = [
+    { stylers: [{ saturation: -100 }] },
+    { featureType: "poi", stylers: [{ visibility: "off" }] },
+    { featureType: "transit", stylers: [{ visibility: "off" }] },
+    { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#d3d5db" }] }
+  ];
+
+  var basemap = null;
+
   // Esri Light Gray Canvas: minimal basemap, free, no API key, works from file:// and GitHub Pages.
   // Real tiles only exist up to zoom 16; beyond that Leaflet enlarges them (maxNativeZoom).
-  var ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
-  L.tileLayer(ESRI + "World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
-    maxZoom: MAX_ZOOM,
-    maxNativeZoom: 16,
-    attribution:
-      'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, HERE, Garmin, ' +
-      '&copy; OpenStreetMap contributors, and the GIS User Community'
-  }).addTo(map);
-  // Street / place name labels drawn on top of the gray base.
-  L.tileLayer(ESRI + "World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
-    maxZoom: MAX_ZOOM,
-    maxNativeZoom: 16
-  }).addTo(map);
+  function useEsri() {
+    if (basemap) map.removeLayer(basemap);
+    var ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+    basemap = L.layerGroup([
+      L.tileLayer(ESRI + "World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: MAX_ZOOM,
+        maxNativeZoom: 16,
+        attribution:
+          'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, HERE, Garmin, ' +
+          '&copy; OpenStreetMap contributors, and the GIS User Community'
+      }),
+      // Street / place name labels drawn on top of the gray base.
+      L.tileLayer(ESRI + "World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: MAX_ZOOM,
+        maxNativeZoom: 16
+      })
+    ]).addTo(map);
+    removeGoogleLogo();
+  }
+
+  // Google's terms require its logo + the copyright text for the area on screen.
+  var googleLogo = null;
+  var googleCopyright = "";
+  function removeGoogleLogo() {
+    if (googleLogo) { map.removeControl(googleLogo); googleLogo = null; }
+    if (googleCopyright) { map.attributionControl.removeAttribution(googleCopyright); googleCopyright = ""; }
+  }
+
+  function useGoogle(key) {
+    var api = "https://tile.googleapis.com";
+    // 1. Start a map session (sets the style). Fails if the key is missing/invalid/restricted.
+    fetch(api + "/v1/createSession?key=" + encodeURIComponent(key), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mapType: "roadmap", language: "en-NZ", region: "NZ", styles: GOOGLE_STYLE })
+    })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)); })
+      .then(function (s) {
+        var q = "?session=" + encodeURIComponent(s.session) + "&key=" + encodeURIComponent(key);
+        var layer = L.tileLayer(api + "/v1/2dtiles/{z}/{x}/{y}" + q, {
+          maxZoom: MAX_ZOOM,
+          attribution: "Map data &copy; Google"
+        });
+        // 2. If tiles keep failing (quota used up, key revoked…), switch to Esri.
+        var errors = 0;
+        layer.on("tileerror", function () {
+          if (++errors === 6) { console.warn("Google tiles failing, switching to Esri"); useEsri(); }
+        });
+        if (basemap) map.removeLayer(basemap);
+        basemap = layer.addTo(map);
+
+        googleLogo = L.control({ position: "bottomleft" });
+        googleLogo.onAdd = function () {
+          var img = L.DomUtil.create("img", "google-logo");
+          img.src = "https://maps.gstatic.com/mapfiles/api-3/images/google_white5_hdpi.png";
+          img.alt = "Google";
+          return img;
+        };
+        googleLogo.addTo(map);
+
+        // 3. Keep the copyright text in sync with the area shown.
+        function updateCopyright() {
+          if (basemap !== layer) return;
+          var b = map.getBounds();
+          fetch(api + "/tile/v1/viewport" + q + "&zoom=" + map.getZoom() +
+                "&north=" + b.getNorth() + "&south=" + b.getSouth() +
+                "&east=" + b.getEast() + "&west=" + b.getWest())
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (v) {
+              if (basemap !== layer || !v || !v.copyright || v.copyright === googleCopyright) return;
+              map.attributionControl.removeAttribution(googleCopyright || "Map data &copy; Google");
+              googleCopyright = v.copyright;
+              map.attributionControl.addAttribution(googleCopyright);
+            })
+            .catch(function () {});
+        }
+        map.on("moveend", updateCopyright);
+        updateCopyright();
+      })
+      .catch(function (e) {
+        console.warn("Google Maps unavailable (" + e.message + "), using Esri");
+        useEsri();
+      });
+  }
+
+  if (GOOGLE_MAPS_KEY) useGoogle(GOOGLE_MAPS_KEY);
+  else useEsri();
 
   function resetView() {
     map.fitBounds(CBD_BOUNDS, { padding: [10, 10] });
