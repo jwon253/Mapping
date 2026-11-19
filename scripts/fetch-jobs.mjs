@@ -18,9 +18,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-// Identifies this script honestly to each careers site, with a link so site
-// owners can see what it is and get in touch (via the repo) if they have concerns.
-const UA = "AucklandCompanyMap/1.0 (+https://github.com/jwon253/Mapping; personal portfolio project; weekly job count)";
+const UA = "AucklandCompanyMap/1.0 (personal portfolio project; weekly job count)";
 
 // Ads that aren't real openings.
 const PLACEHOLDER = /expressions? of interest|share your details|register your interest|talent (pool|community)|general application/i;
