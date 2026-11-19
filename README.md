@@ -40,6 +40,17 @@ node scripts/fetch-jobs.mjs "ANZ"     # refresh only some companies
   Esri as an automatic fallback. Locally you'll see Esri.
 - Run `git pull` before making changes, so you have the weekly bot's latest commit.
 
+```
+index.html                          page layout
+css/style.css                       styles
+js/app.js                           map, pins, sidebar, roles panel
+data/companies.js                   companies: location, logo, careers link
+data/jobs.js                        open roles (generated, don't edit)
+img/                                company logos
+scripts/fetch-jobs.mjs              fetches open roles
+.github/workflows/weekly-jobs.yml   weekly automatic update
+```
+
 ## Ideas for later
 
 - Track hiring trends over time
